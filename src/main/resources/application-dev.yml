@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    url: jdbc:h2:file:/data/myco;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+  h2:
+    console.enabled: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    #defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: create-drop
+#  sql:
+#    init:
+#      mode: embedded
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+
+
+  web:
+    resources:
+      static-locations: file:///${file.upload-dir}
+
+file:
+  upload-dir: D:/GitProject/uploads/
+  access-location: http://localhost:${server.port}/
+
+qr:
+  searchUrl: http://localhost:8080/
+
+
+
