@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
 
 springdoc:
   api-docs:
@@ -38,9 +38,15 @@ spring:
     resources:
       static-locations: file:///${file.upload-dir}
 
+    cors:
+      allowed-origins: "*" # Allow requests from any origin
+      allowed-methods: "*" # Allow all HTTP methods (GET, POST, etc.)
+      allowed-headers: "*" # Allow all headers
+
+# Use environment variables for external URLs and paths, with local fallbacks.
 file:
-  upload-dir: D:/GitProject/uploads/
-  access-location: http://localhost:${server.port}/
+  upload-dir: ${FILE_UPLOAD_DIR:D:/GitProject/uploads/}
+  access-location: ${APP_BASE_URL:http://localhost:8080}/
 
 qr:
-  searchUrl: http://localhost:8080/
+  searchUrl: ${APP_BASE_URL:http://localhost:8080}/
