@@ -1,0 +1,21 @@
+steps:
+  # Step 1: Use Maven to build the application and create the JAR file.
+  # We skip tests here to speed up the CI/CD build.
+  - id: 'Build JAR'
+    name: 'gcr.io/cloud-builders/mvn'
+    args: ['package', '-DskipTests']
+
+  # Step 2: Build the container image for the backend and tag it for Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - "build"
+      - "-t"
+      - "us-central1-docker.pkg.dev/myco-ui-478310/myco-repo/myco:latest"
+      - "."
+    waitFor: ['Build JAR'] # Wait for the JAR to be built before starting the Docker build.
+
+  # Step 3: Push the backend image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - "push"
+      - "us-central1-docker.pkg.dev/myco-ui-478310/myco-repo/myco:latest"

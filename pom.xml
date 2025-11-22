@@ -92,6 +92,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>myco</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -107,26 +108,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin>
-				<groupId>com.google.cloud.tools</groupId>
-				<artifactId>jib-maven-plugin</artifactId>
-				<version>3.4.3</version>
-				<configuration>
-					<from><image>eclipse-temurin:17-jdk-jammy</image></from>
-					<to>
-						<image>shekharkumargupta/myco:latest</image>
-					</to>
-				</configuration>
-
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>build</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin> -->
 		</plugins>
 	</build>
 

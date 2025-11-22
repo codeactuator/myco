@@ -1,10 +1,9 @@
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk-jammy
 
 MAINTAINER SKCodify
 
-COPY target/myco-0.0.1-SNAPSHOT.jar myco-0.0.1-SNAPSHOT.jar
+COPY target/myco.jar myco.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=dev", "myco-0.0.1-SNAPSHOT.jar"]
-
+ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=dev", "myco.jar"]
