@@ -1,0 +1,48 @@
+C:\Program Files (x86)\Google\Chrome\Application\chrome.exe --disable-web-security --disable-gpu --user-data-dir=~/chromeTemp
+
+	PROJECT_ID=myco-ui-478310 
+	PROJECT_NUM=$(gcloud projects describe $PROJECT_ID --format="value(projectNumber)") 
+	SA="739090069672@cloudbuild.gserviceaccount.com"
+
+
+
+
+Steps to deploy:
+
+#  Create docker image of myco-ui with google cloud build without installing docker on local
+
+	proejct number is: 739090069672
+
+	##User permissions are required to set to allow user
+
+	glcloud auth list
+	glcloud auth login
+	
+	gcloud config set account `dev.shekharkumargupta@gmail.com`
+	gcloud config set project myco-ui-478310
+
+	gcloud container clusters create myco-cluster --zone asia-east1-a --num-nodes 2
+	gcloud container clusters resize myco-cluster --zone asia-east1-a --num-nodes 3
+
+	gcloud container clusters get-credentials myco-cluster --zone asia-east1-a --project myco-ui-478310
+
+	kubectl apply -f deployment.yaml
+
+
+	gcloud services enable artifactregistry.googleapis.com --project=myco-ui-478310
+	gcloud artifacts repositories create myco-repo --repository-format=docker --location=us-central1 --description="Docker repository for myco application" --project=myco-ui-478310
+	gcloud builds submit --config cloudbuild.yaml .
+
+	# Navigate to your frontend directory
+	cd d:\GitProject\myco-project\myco-ui
+
+	# Run the build, replacing 35.4.5.6 with your actual backend IP
+	gcloud builds submit --config cloudbuild.yaml --substitutions=_API_URL="http://104.199.184.174:8080/api"
+	gcloud services enable secretmanager.googleapis.com --project=myco-ui-478310
+
+
+
+	gcloud projects describe myco-ui-478310 
+	gcloud builds submit --config cloudbuild.yaml .
+
+
