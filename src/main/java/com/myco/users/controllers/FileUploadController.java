@@ -9,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.concurrent.CompletableFuture;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("v1/files")
 public class FileUploadController {

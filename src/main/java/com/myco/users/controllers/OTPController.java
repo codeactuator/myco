@@ -8,7 +8,6 @@ import com.myco.users.services.OTPService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("v1/otp")
 public class OTPController {

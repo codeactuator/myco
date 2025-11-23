@@ -27,11 +27,8 @@ spring:
       static-locations: file:///${file.upload-dir}
 
 file:
-  upload-dir: D:/GitProject/uploads/
-  access-location: http://localhost:${server.port}/
+  upload-dir: ${FILE_UPLOAD_DIR:D:/GitProject/uploads/}
+  access-location: ${APP_BASE_URL:http://localhost:8080}/
 
 qr:
-  searchUrl: http://localhost:8080/
-
-
-
+  searchUrl: ${APP_BASE_URL:http://localhost:8080}/

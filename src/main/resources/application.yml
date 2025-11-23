@@ -13,6 +13,7 @@ spring:
 
   h2:
     console:
+      # The context path must be added here as well for H2 console to be accessible
       path: /h2-console
       enabled: true
   datasource:
