@@ -1,5 +1,9 @@
 server:
   port: ${SERVER_PORT:8080}
+  servlet:
+    # Set the context path for all controllers
+    context-path: /api
+
 
 springdoc:
   api-docs:
@@ -14,7 +18,6 @@ spring:
   h2:
     console:
       # The context path must be added here as well for H2 console to be accessible
-      path: /h2-console
       enabled: true
   datasource:
     url: jdbc:h2:file:/data/myco;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
@@ -29,11 +32,6 @@ spring:
 #  sql:
 #    init:
 #      mode: embedded
-
-  servlet:
-    multipart:
-      max-file-size: 5MB
-      max-request-size: 5MB
 
   web:
     resources:
