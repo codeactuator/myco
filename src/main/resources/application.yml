@@ -47,5 +47,3 @@ file:
   upload-dir: ${FILE_UPLOAD_DIR:D:/GitProject/uploads/}
   access-location: ${APP_BASE_URL:http://localhost:8080}/
 
-qr:
-  searchUrl: ${APP_BASE_URL:http://localhost:8080}/

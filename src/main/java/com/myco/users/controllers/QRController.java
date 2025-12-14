@@ -25,27 +25,13 @@ public class QRController {
         return HttpStatus.OK.name();
     }
 
-    @GetMapping(value = "/{userId}", produces = MediaType.IMAGE_PNG_VALUE)
-    public byte[] getQRCode(@PathVariable String userId){
-        String userUrl = appUserService.createUserUrl(userId);
-        byte[] image = new byte[0];
-        try {
-            image = qrCodeServiceImpl.create(userUrl,250,250);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return image;
+    @GetMapping(value = "/{userId}")
+    public String getQRCode(@PathVariable String userId){
+        return userId;
     }
 
-    @PostMapping(produces = MediaType.IMAGE_PNG_VALUE)
-    public byte[] createQRCode(@RequestBody String mobileNumber){
-        String userUrl = appUserService.createUserUrl(mobileNumber);
-        byte[] image = new byte[0];
-        try {
-            image = qrCodeServiceImpl.create(userUrl,250,250);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return image;
+    @PostMapping
+    public String createQRCode(@RequestBody String mobileNumber){
+        return appUserService.findByMobileNumber(mobileNumber).getId().toString();
     }
 }

@@ -15,9 +15,6 @@ import java.util.UUID;
 @Service
 public class AppUserServiceImpl implements AppUserService{
 
-    @Value("${qr.searchUrl}")
-    private String searchUrl;
-
     private final AppUserRepository appUserRepository;
     private final QRCodeRepository qrCodeRepository;
     private final QRCodeGeneratorService qrCodeGeneratorService;
@@ -67,11 +64,5 @@ public class AppUserServiceImpl implements AppUserService{
     @Override
     public List<AppUser> findAll() {
         return appUserRepository.findAll();
-    }
-
-    @Override
-    public String createUserUrl(String userId) {
-        String qrUrl = searchUrl + "/" + userId;
-        return qrUrl;
     }
 }

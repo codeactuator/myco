@@ -18,5 +18,4 @@ public interface AppUserService {
 
     public AppUser findByMobileNumber(String mobileNumber);
     public List<AppUser> findAll();
-    public String createUserUrl(String mobileNumber);
 }

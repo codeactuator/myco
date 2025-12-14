@@ -6,7 +6,6 @@ C:\Program Files (x86)\Google\Chrome\Application\chrome.exe --disable-web-securi
 
 
 
-
 Steps to deploy:
 
 #  Create docker image of myco-ui with google cloud build without installing docker on local
