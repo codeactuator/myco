@@ -27,6 +27,9 @@ public class Promotion {
     private String status; // ACTIVE, INACTIVE
     private String imageUrl;
 
+    private Long viewCount = 0L;
+    private Long likeCount = 0L;
+
     @ManyToOne
     @JoinColumn(name = "vendor_id")
     private Vendor vendor;

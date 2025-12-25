@@ -22,6 +22,11 @@ public class PromotionController {
         return promotionService.getPromotionsByVendor(vendorId);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Promotion> getPromotionById(@PathVariable UUID id) {
+        return ResponseEntity.ok(promotionService.getPromotionById(id));
+    }
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Promotion createPromotion(@RequestPart("promotion") Promotion promotion,
                                      @RequestPart(value = "image", required = false) MultipartFile image) {
@@ -38,6 +43,24 @@ public class PromotionController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePromotion(@PathVariable UUID id) {
         promotionService.deletePromotion(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/send")
+    public ResponseEntity<Void> sendPromotion(@PathVariable UUID id) {
+        promotionService.sendPromotionToConsumers(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/view")
+    public ResponseEntity<Void> incrementViewCount(@PathVariable UUID id) {
+        promotionService.incrementViewCount(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/like")
+    public ResponseEntity<Void> incrementLikeCount(@PathVariable UUID id) {
+        promotionService.incrementLikeCount(id);
         return ResponseEntity.ok().build();
     }
 }
