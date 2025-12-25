@@ -4,6 +4,8 @@ import com.myco.users.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "system_users")
 @Data
@@ -28,7 +30,7 @@ public class SystemUser {
 
     // Specific to VENDOR role. Nullable for Admin/Support.
     @Column(name = "vendor_id")
-    private Long vendorId;
+    private UUID vendorId;
 
     @Column(nullable = false)
     private String status = "ACTIVE";

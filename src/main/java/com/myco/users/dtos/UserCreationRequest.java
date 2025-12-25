@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 public class UserCreationRequest {
     @NotBlank(message = "Username is required")
@@ -21,5 +23,5 @@ public class UserCreationRequest {
     @NotNull(message = "Role is required")
     private UserRole role;
 
-    private Long vendorId;
+    private UUID vendorId;
 }
