@@ -16,6 +16,11 @@ public class VendorService {
         return vendorRepository.findAll();
     }
 
+    public Vendor getVendor(UUID id) {
+        return vendorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Vendor not found"));
+    }
+
     public Vendor saveVendor(Vendor vendor) {
         return vendorRepository.save(vendor);
     }
