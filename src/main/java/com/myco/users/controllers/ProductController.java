@@ -5,13 +5,16 @@ import com.myco.users.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("v1/products")
 @CrossOrigin(origins = "*")
 public class ProductController {
+
     @Autowired
     private ProductService productService;
 
@@ -25,6 +28,11 @@ public class ProductController {
         return productService.saveProduct(product);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getProduct(@PathVariable UUID id) {
+        return ResponseEntity.ok(productService.getProduct(id));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable UUID id, @RequestBody Product product) {
         return ResponseEntity.ok(productService.updateProduct(id, product));
@@ -36,8 +44,26 @@ public class ProductController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<?> registerProduct(@RequestBody Map<String, String> payload) {
+        UUID userId = UUID.fromString(payload.get("userId"));
+        UUID productId = UUID.fromString(payload.get("productId"));
+        productService.registerProduct(userId, productId);
+        return ResponseEntity.ok(Map.of("message", "Product registered successfully"));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Map<String, Object>>> getUserProducts(@PathVariable UUID userId) {
+        return ResponseEntity.ok(productService.getUserProducts(userId));
+    }
+
     @GetMapping("/vendor/{vendorId}")
-    public List<Product> getProductsByVendor(@PathVariable UUID vendorId) {
-        return productService.getProductsByVendor(vendorId);
+    public ResponseEntity<List<Map<String, Object>>> getVendorProducts(@PathVariable UUID vendorId) {
+        return ResponseEntity.ok(productService.getVendorProducts(vendorId));
+    }
+
+    @GetMapping("/owner/{productInstanceId}")
+    public ResponseEntity<UUID> getProductOwner(@PathVariable UUID productInstanceId) {
+        return ResponseEntity.ok(productService.getProductOwner(productInstanceId));
     }
 }
