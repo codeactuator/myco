@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("v1/users")
 public class AppUserController {
@@ -44,5 +46,10 @@ public class AppUserController {
     @PostMapping
     public AppUser create(@RequestBody @Valid AppUser appUser){
         return appUserService.save(appUser);
+    }
+
+    @PutMapping("/{id}")
+    public AppUser update(@PathVariable String id, @RequestBody AppUser appUser){
+        return appUserService.update(UUID.fromString(id), appUser);
     }
 }

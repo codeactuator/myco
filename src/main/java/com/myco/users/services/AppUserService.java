@@ -18,4 +18,5 @@ public interface AppUserService {
 
     public AppUser findByMobileNumber(String mobileNumber);
     public List<AppUser> findAll();
+    public AppUser update(UUID id, AppUser appUser);
 }

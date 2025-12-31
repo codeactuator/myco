@@ -65,4 +65,14 @@ public class AppUserServiceImpl implements AppUserService{
     public List<AppUser> findAll() {
         return appUserRepository.findAll();
     }
+
+    @Override
+    public AppUser update(UUID id, AppUser appUser) {
+        AppUser existingUser = appUserRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        if (appUser.getName() != null && !appUser.getName().isEmpty()) {
+            existingUser.setName(appUser.getName());
+        }
+        return appUserRepository.save(existingUser);
+    }
 }
