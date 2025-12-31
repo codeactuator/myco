@@ -25,9 +25,14 @@ public class AppUserController {
     }
 
     @GetMapping("/{mobileNumber}")
-    public AppUser findByMobileNumber(String mobileNumber){
+    public AppUser findByMobileNumber(@PathVariable String mobileNumber){
         AppUser appUser = appUserService.findByMobileNumber(mobileNumber);
         return appUser;
+    }
+
+    @GetMapping("/id/{id}")
+    public AppUser findById(@PathVariable String id){
+        return appUserService.find(id);
     }
 
     @PostMapping("/verified")

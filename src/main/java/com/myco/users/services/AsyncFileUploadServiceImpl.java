@@ -24,9 +24,9 @@ import java.util.concurrent.CompletableFuture;
 public class AsyncFileUploadServiceImpl implements FileUploadService {
 
     //@Value("${file.upload-dir}")
-    private String uploadDir = System.getProperty("user.dir");
+    private String uploadDir = Paths.get(System.getProperty("user.dir"), "uploads").toString();
     //@Value("${file.access-location}")
-    private String accessLocation = System.getProperty("user.dir");;
+    private String accessLocation = Paths.get(System.getProperty("user.dir"), "uploads").toString() + java.io.File.separator;
 
     @Autowired
     private UploadedFileRepository uploadedFileRepository;
