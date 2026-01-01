@@ -9,6 +9,7 @@ import com.myco.users.mappers.CommentMapper;
 import com.myco.users.repositories.AppUserRepository;
 import com.myco.users.repositories.CommentRepository;
 import com.myco.users.repositories.PostRepository;
+import com.myco.users.repositories.SystemUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Autowired
     private AppUserRepository appUserRepository;
+
+    @Autowired
+    private SystemUserRepository systemUserRepository;
 
     @Autowired
     private PostRepository postRepository;
@@ -66,8 +70,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private CommentDto mapCommentToDto(Comment comment) {
-        String userName = appUserRepository.findById(UUID.fromString(comment.getCommentedBy()))
+        UUID userId = UUID.fromString(comment.getCommentedBy());
+        String userName = appUserRepository.findById(userId)
                 .map(AppUser::getName)
+                .or(() -> systemUserRepository.findById(userId).map(u -> "Myco Support"))
                 .orElse("Anonymous");
 
         return CommentMapper.toDto(comment, userName);

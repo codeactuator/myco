@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class SystemUserService {
@@ -50,7 +51,7 @@ public class SystemUserService {
     }
 
     @Transactional
-    public SystemUser updateUser(Long id, UserCreationRequest request) {
+    public SystemUser updateUser(UUID id, UserCreationRequest request) {
         SystemUser user = systemUserRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -64,12 +65,12 @@ public class SystemUserService {
     }
 
     @Transactional
-    public void deleteUser(Long id) {
+    public void deleteUser(UUID id) {
         systemUserRepository.deleteById(id);
     }
 
     @Transactional
-    public SystemUser toggleUserStatus(Long id) {
+    public SystemUser toggleUserStatus(UUID id) {
         SystemUser user = systemUserRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         user.setStatus("ACTIVE".equals(user.getStatus()) ? "INACTIVE" : "ACTIVE");

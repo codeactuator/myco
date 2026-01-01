@@ -21,7 +21,7 @@ public class AlertsController {
     @Autowired
     private AppUserService appUserService;
 
-    @GetMapping("/alerts/{userId}")
+    @GetMapping("/alerts/user/{userId}")
     public List<Post> getAlertsForUser(@PathVariable String userId) {
         // 1. Get the user's mobile number to find who has listed them as a contact
         AppUser user = appUserService.find(userId);
@@ -41,6 +41,12 @@ public class AlertsController {
         return entityManager.createQuery(queryStr, Post.class)
                 .setParameter("userId", userId)
                 .setParameter("userMobile", userMobile)
+                .getResultList();
+    }
+
+    @GetMapping("/alerts/all")
+    public List<Post> getAllAlerts() {
+        return entityManager.createQuery("SELECT p FROM Post p ORDER BY p.createdAt DESC", Post.class)
                 .getResultList();
     }
 }

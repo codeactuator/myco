@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1/admin/system-users")
@@ -33,18 +34,18 @@ public class AdminSystemUserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody UserCreationRequest request) {
+    public ResponseEntity<?> updateUser(@PathVariable UUID id, @Valid @RequestBody UserCreationRequest request) {
         return ResponseEntity.ok(systemUserService.updateUser(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<?> deleteUser(@PathVariable UUID id) {
         systemUserService.deleteUser(id);
         return ResponseEntity.ok("User deleted successfully");
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<?> toggleUserStatus(@PathVariable Long id) {
+    public ResponseEntity<?> toggleUserStatus(@PathVariable UUID id) {
         return ResponseEntity.ok(systemUserService.toggleUserStatus(id));
     }
 }

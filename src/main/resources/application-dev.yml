@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:file:/data/myco;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:file:./data/myco;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: sa
     password: password
     driverClassName: org.h2.Driver
@@ -10,7 +10,7 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     #defer-datasource-initialization: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
 #  sql:
 #    init:
 #      mode: embedded
