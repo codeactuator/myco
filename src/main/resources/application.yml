@@ -14,24 +14,33 @@ springdoc:
 spring:
   application:
     name: myco
-
-  h2:
-    console:
-      # The context path must be added here as well for H2 console to be accessible
-      enabled: true
+  cloud:
+    gcp:
+      credentials:
+        # Point to your Service Account Key. Defaults to 'gcp-key.json' in project root if env var not set.
+        location: ${GCP_CREDENTIALS_LOCATION:file:gcp-key.json}
+      sql:
+        enabled: true
+        # Format: PROJECT_ID:REGION:INSTANCE_NAME
+        instance-connection-name: myco-ui-478310:asia-east1:myco-mysql-instance
+        database-name: myco_db
   datasource:
-    url: jdbc:h2:file:./data/myco;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
-    password: password
-    driverClassName: org.h2.Driver
+    username: root
+    password: ${DB_PASSWORD:adminadmin}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      max-lifetime: 1800000
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    #defer-datasource-initialization: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
-#  sql:
-#    init:
-#      mode: embedded
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
   web:
     resources:
