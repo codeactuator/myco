@@ -1,17 +1,29 @@
 package com.myco.users.services;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.myco.users.entities.Product;
 import com.myco.users.entities.ProductInstance;
 import com.myco.users.entities.ProductRegistration;
 import com.myco.users.repositories.ProductInstanceRepository;
 import com.myco.users.repositories.ProductRegistrationRepository;
 import com.myco.users.repositories.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -21,6 +33,18 @@ public class ProductService {
     private ProductInstanceRepository productInstanceRepository;
     @Autowired
     private ProductRegistrationRepository productRegistrationRepository;
+    @Autowired
+    private ShortLinkService shortLinkService;
+
+    private final Path fileStorageLocation = Paths.get("uploads").toAbsolutePath().normalize();
+
+    public ProductService() {
+        try {
+            Files.createDirectories(this.fileStorageLocation);
+        } catch (Exception ex) {
+            throw new RuntimeException("Could not create the directory where the uploaded files will be stored.", ex);
+        }
+    }
 
     public void registerProduct(UUID userId, UUID qrUuid) {
         if (productRegistrationRepository.existsByProductInstanceId(qrUuid)) {
@@ -94,5 +118,27 @@ public class ProductService {
 
     public void deleteProduct(UUID id) {
         productRepository.deleteById(id);
+    }
+
+    public String getShortCode(UUID productInstanceId) {
+        return shortLinkService.getShortCode(productInstanceId);
+    }
+
+    public void uploadImage(UUID id, MultipartFile file) {
+        Product product = getProduct(id);
+        String fileName = storeFile(file);
+        product.setImageUrl(fileName);
+        productRepository.save(product);
+    }
+
+    private String storeFile(MultipartFile file) {
+        String fileName = UUID.randomUUID().toString() + "_" + StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+        try {
+            Path targetLocation = this.fileStorageLocation.resolve(fileName);
+            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+            return fileName;
+        } catch (IOException ex) {
+            throw new RuntimeException("Could not store file " + fileName + ". Please try again!", ex);
+        }
     }
 }

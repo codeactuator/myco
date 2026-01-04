@@ -46,4 +46,12 @@ public class ShortLinkService {
                 .map(ShortLink::getTargetUuid)
                 .orElseThrow(() -> new RuntimeException("Link not found"));
     }
+
+    public String getShortCode(UUID targetUuid) {
+        return shortLinkRepository.findAll().stream()
+                .filter(link -> link.getTargetUuid().equals(targetUuid))
+                .findFirst()
+                .map(ShortLink::getShortCode)
+                .orElse(null);
+    }
 }

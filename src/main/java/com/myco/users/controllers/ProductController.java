@@ -5,13 +5,14 @@ import com.myco.users.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("v1/products")
+@RequestMapping("/v1/products")
 @CrossOrigin(origins = "*")
 public class ProductController {
 
@@ -46,10 +47,18 @@ public class ProductController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerProduct(@RequestBody Map<String, String> payload) {
-        UUID userId = UUID.fromString(payload.get("userId"));
-        UUID productId = UUID.fromString(payload.get("productId"));
-        productService.registerProduct(userId, productId);
-        return ResponseEntity.ok(Map.of("message", "Product registered successfully"));
+        try {
+            UUID userId = UUID.fromString(payload.get("userId"));
+            UUID productId = UUID.fromString(payload.get("productInstanceId"));
+            productService.registerProduct(userId, productId);
+            return ResponseEntity.ok(Map.of("message", "Product registered successfully"));
+        } catch (Exception e) {
+            String message = e.getMessage();
+            if (message != null && message.contains("Product already registered")) {
+                message = "Product already registered";
+            }
+            return ResponseEntity.badRequest().body(Map.of("message", message != null ? message : "Registration failed"));
+        }
     }
 
     @GetMapping("/user/{userId}")
@@ -65,5 +74,17 @@ public class ProductController {
     @GetMapping("/owner/{productInstanceId}")
     public ResponseEntity<UUID> getProductOwner(@PathVariable UUID productInstanceId) {
         return ResponseEntity.ok(productService.getProductOwner(productInstanceId));
+    }
+
+    @GetMapping("/short-code/{productInstanceId}")
+    public ResponseEntity<Map<String, String>> getProductShortCode(@PathVariable UUID productInstanceId) {
+        String code = productService.getShortCode(productInstanceId);
+        return ResponseEntity.ok(Map.of("shortCode", code != null ? code : ""));
+    }
+
+    @PostMapping(value = "/{id}/image", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadProductImage(@PathVariable UUID id, @RequestParam("file") MultipartFile file) {
+        productService.uploadImage(id, file);
+        return ResponseEntity.ok().build();
     }
 }
