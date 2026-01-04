@@ -54,3 +54,23 @@ Caused by: org.h2.jdbc.JdbcSQLInvalidAuthorizationSpecException: Wrong user name
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:522)
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
 	... 50 more
+2026-01-03 19:46:20.254268+05:30 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]SHORT_LINKS"; expected "SAVEPOINT, SCRIPT, SHUTDOWN"; SQL statement:
+SHORT_LINKS [42001-232]
+2026-01-03 19:54:00.596803+05:30 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]PRODUCT_INSTANCES"; expected "PREPARE"; SQL statement:
+PRODUCT_INSTANCES [42001-232]
+2026-01-03 19:58:16.204439+05:30 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "select * from SHORT_LINKS \000d\000a\000d\000a[*]select * from PRODUCT_INSTANCES"; SQL statement:
+select * from SHORT_LINKS 
+
+select * from PRODUCT_INSTANCES [42000-232]
+2026-01-03 19:58:24.696616+05:30 jdbc[23]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "SELECT * FROM PRODUCTS \000d\000a\000d\000a[*]select * from APP_USER \000d\000a\000d\000aselect * from SHORT_LINKS \000d\000a\000d\000aselect * from PRODUCT_INSTANCES"; SQL statement:
+SELECT * FROM PRODUCTS 
+
+select * from APP_USER 
+
+select * from SHORT_LINKS 
+
+select * from PRODUCT_INSTANCES [42000-232]
