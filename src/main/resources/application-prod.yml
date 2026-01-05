@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: myco
+  cloud:
+    gcp:
+      credentials:
+        # Point to your Service Account Key. Defaults to 'gcp-key.json' in project root if env var not set.
+        location: ${GCP_CREDENTIALS_LOCATION:file:gcp-key.json}
+      sql:
+        enabled: true
+        # Format: PROJECT_ID:REGION:INSTANCE_NAME
+        instance-connection-name: myco-ui-478310:asia-east1:myco-mysql-instance
+        database-name: myco_db
+  datasource:
+    username: root
+    password: ${DB_PASSWORD:adminadmin}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      max-lifetime: 1800000
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  web:
+    resources:
+      static-locations: file:///${file.upload-dir}
+
+    cors:
+      allowed-origins: "*" # Allow requests from any origin
+      allowed-methods: "*" # Allow all HTTP methods (GET, POST, etc.)
+      allowed-headers: "*" # Allow all headers
+
+# Use environment variables for external URLs and paths, with local fallbacks.
+file:
+  upload-dir: ${FILE_UPLOAD_DIR:D:/GitProject/uploads/}
+  access-location: ${APP_BASE_URL:http://localhost:8080}/
