@@ -1,10 +1,5 @@
 package com.myco.users.services;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -17,10 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.beans.factory.annotation.Value;
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Storage;
 
 import com.myco.users.entities.Product;
 import com.myco.users.entities.ProductInstance;
@@ -39,22 +30,8 @@ public class ProductService {
     private ProductRegistrationRepository productRegistrationRepository;
     @Autowired
     private ShortLinkService shortLinkService;
-
-    @Autowired(required = false)
-    private Storage storage;
-
-    @Value("${gcp.bucket.name:myco-uploads}")
-    private String bucketName;
-
-    private final Path fileStorageLocation = Paths.get("uploads").toAbsolutePath().normalize();
-
-    public ProductService() {
-        try {
-            Files.createDirectories(this.fileStorageLocation);
-        } catch (Exception ex) {
-            throw new RuntimeException("Could not create the directory where the uploaded files will be stored.", ex);
-        }
-    }
+    @Autowired
+    private FileStorageService fileStorageService;
 
     public void registerProduct(UUID userId, UUID qrUuid) {
         if (productRegistrationRepository.existsByProductInstanceId(qrUuid)) {
@@ -86,6 +63,7 @@ public class ProductService {
                     map.put("id", reg.getProductInstance().getId());
                     map.put("name", p.getName());
                     map.put("description", p.getDescription());
+
                     map.put("imageUrl", p.getImageUrl());
                     map.put("registrationDate", reg.getRegistrationDate());
                     return map;
@@ -100,6 +78,7 @@ public class ProductService {
                     map.put("id", p.getId());
                     map.put("name", p.getName());
                     map.put("description", p.getDescription());
+
                     map.put("imageUrl", p.getImageUrl());
                     return map;
                 })
@@ -136,31 +115,8 @@ public class ProductService {
 
     public void uploadImage(UUID id, MultipartFile file) {
         Product product = getProduct(id);
-        String fileName = storeFile(file);
+        String fileName = fileStorageService.storeFile(file);
         product.setImageUrl(fileName);
         productRepository.save(product);
-    }
-
-    private String storeFile(MultipartFile file) {
-        String fileName = UUID.randomUUID().toString() + "_" + StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-
-        if (storage != null) {
-            try {
-                BlobId blobId = BlobId.of(bucketName, fileName);
-                BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(file.getContentType()).build();
-                storage.create(blobInfo, file.getBytes());
-                return fileName;
-            } catch (IOException ex) {
-                throw new RuntimeException("Could not store file " + fileName + " in GCS. Please try again!", ex);
-            }
-        }
-
-        try {
-            Path targetLocation = this.fileStorageLocation.resolve(fileName);
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-            return fileName;
-        } catch (IOException ex) {
-            throw new RuntimeException("Could not store file " + fileName + ". Please try again!", ex);
-        }
     }
 }

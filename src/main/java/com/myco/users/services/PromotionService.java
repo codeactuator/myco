@@ -7,16 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Storage;
 
-import java.io.IOException;
-import java.nio.file.*;
 import java.util.List;
 import java.util.UUID;
-import java.util.Objects;
 
 @Service
 public class PromotionService {
@@ -26,22 +19,8 @@ public class PromotionService {
     private VendorRepository vendorRepository;
     @Autowired
     private NotificationService notificationService;
-
-    @Autowired(required = false)
-    private Storage storage;
-
-    @Value("${gcp.bucket.name:myco-uploads}")
-    private String bucketName;
-
-    private final Path fileStorageLocation = Paths.get("uploads").toAbsolutePath().normalize();
-
-    public PromotionService() {
-        try {
-            Files.createDirectories(this.fileStorageLocation);
-        } catch (Exception ex) {
-            throw new RuntimeException("Could not create the directory where the uploaded files will be stored.", ex);
-        }
-    }
+    @Autowired
+    private FileStorageService fileStorageService;
 
     public List<Promotion> getPromotionsByVendor(UUID vendorId) {
         return promotionRepository.findByVendorId(vendorId);
@@ -58,7 +37,7 @@ public class PromotionService {
                  .orElseThrow(() -> new RuntimeException("Vendor not found"));
         }
         if (file != null && !file.isEmpty()) {
-            String fileName = storeFile(file);
+            String fileName = fileStorageService.storeFile(file);
             promotion.setImageUrl(fileName);
         }
         return promotionRepository.save(promotion);
@@ -77,7 +56,7 @@ public class PromotionService {
         promotion.setStatus(promotionDetails.getStatus());
 
         if (file != null && !file.isEmpty()) {
-            String fileName = storeFile(file);
+            String fileName = fileStorageService.storeFile(file);
             promotion.setImageUrl(fileName);
         }
         
@@ -117,28 +96,5 @@ public class PromotionService {
                 .orElseThrow(() -> new RuntimeException("Promotion not found"));
         promotion.setLikeCount(promotion.getLikeCount() == null ? 1 : promotion.getLikeCount() + 1);
         promotionRepository.save(promotion);
-    }
-
-    private String storeFile(MultipartFile file) {
-        String fileName = UUID.randomUUID().toString() + "_" + StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-
-        if (storage != null) {
-            try {
-                BlobId blobId = BlobId.of(bucketName, fileName);
-                BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(file.getContentType()).build();
-                storage.create(blobInfo, file.getBytes());
-                return fileName;
-            } catch (IOException ex) {
-                throw new RuntimeException("Could not store file " + fileName + " in GCS. Please try again!", ex);
-            }
-        }
-
-        try {
-            Path targetLocation = this.fileStorageLocation.resolve(fileName);
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-            return fileName;
-        } catch (IOException ex) {
-            throw new RuntimeException("Could not store file " + fileName + ". Please try again!", ex);
-        }
     }
 }

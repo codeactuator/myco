@@ -12,10 +12,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -23,10 +19,6 @@ import java.util.concurrent.CompletableFuture;
 @Service("asyncFileUploadService")
 public class AsyncFileUploadServiceImpl implements FileUploadService {
 
-    //@Value("${file.upload-dir}")
-    private String uploadDir = Paths.get(System.getProperty("user.dir"), "uploads").toString();
-    //@Value("${file.access-location}")
-    private String accessLocation = Paths.get(System.getProperty("user.dir"), "uploads").toString() + java.io.File.separator;
 
     @Autowired
     private UploadedFileRepository uploadedFileRepository;
@@ -35,18 +27,14 @@ public class AsyncFileUploadServiceImpl implements FileUploadService {
     @Autowired
     private PostRepository postRepository;
 
+    @Autowired
+    private FileStorageService fileStorageService;
+
     @Override
     @Async
     public CompletableFuture<String> uploadFile(MultipartFile file, String userId, Long postId) {
         try {
-            Path uploadPath = Paths.get(uploadDir);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-            Path targetLocation = uploadPath.resolve(fileName);
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+            String fileName = fileStorageService.storeFile(file);
 
             Optional<Post> postOpt = postRepository.findById(postId);
             if (postOpt.isEmpty()) {
@@ -57,7 +45,7 @@ public class AsyncFileUploadServiceImpl implements FileUploadService {
             UploadedFile uploadedFile = new UploadedFile(
                     userId,
                     fileName,
-                    accessLocation + fileName,
+                    fileName,
                     LocalDateTime.now(),
                     post
             );
@@ -65,7 +53,7 @@ public class AsyncFileUploadServiceImpl implements FileUploadService {
 
             String message = "File uploaded (async) successfully: " + fileName + " by user: " + userId;
             return CompletableFuture.completedFuture(message);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             return CompletableFuture.failedFuture(ex);
         }
     }

@@ -9,13 +9,18 @@ import com.myco.users.exceptions.PostNotFoundException;
 import com.myco.users.exceptions.UserNotFoundException;
 import com.myco.users.mappers.PostMapper;
 import com.myco.users.repositories.AppUserRepository;
+import com.myco.users.repositories.ContactRepository;
 import com.myco.users.repositories.PostRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -27,6 +32,11 @@ public class PostServiceImpl implements PostService {
     private PostRepository postRepository;
     @Autowired
     private AppUserRepository appUserRepository;
+    @Autowired
+    private ContactRepository contactRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     @Qualifier("fileUploadService")
@@ -75,15 +85,41 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<PostResponseDto> getPostsByPostedFor(String postedFor) {
-        List<Post> postList = postRepository.findByPostedFor(postedFor);
-        List<PostResponseDto> postResponseDtoList = postList.stream()
+        AppUser user = appUserRepository.findById(UUID.fromString(postedFor))
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + postedFor));
+        String userMobile = user.getMobileNumber();
+
+        List<String> ownerIds = new ArrayList<>();
+        if (userMobile != null) {
+            String contactQuery = "SELECT c.appUser.id FROM Contact c WHERE c.contactNumber = :mobile";
+            List<UUID> ids = entityManager.createQuery(contactQuery, UUID.class)
+                    .setParameter("mobile", userMobile)
+                    .getResultList();
+            ownerIds = ids.stream().map(UUID::toString).collect(Collectors.toList());
+        }
+
+        String queryStr = "SELECT p FROM Post p WHERE p.postedFor = :userId";
+        if (!ownerIds.isEmpty()) {
+            queryStr += " OR p.postedFor IN :ownerIds";
+        }
+        queryStr += " ORDER BY p.createdAt DESC";
+
+        TypedQuery<Post> query = entityManager.createQuery(queryStr, Post.class)
+                .setParameter("userId", postedFor);
+        
+        if (!ownerIds.isEmpty()) {
+            query.setParameter("ownerIds", ownerIds);
+        }
+
+        List<Post> posts = query.getResultList();
+
+        return posts.stream()
                 .map(post -> {
                     AppUser appUser = appUserRepository.findById(UUID.fromString(post.getPostedBy()))
                             .orElseThrow(() -> new UserNotFoundException("User not found: " + post.getPostedBy()));
                     return PostMapper.toDto(post, appUser);
                 })
                 .collect(Collectors.toList());
-        return postResponseDtoList;
     }
 
     @Override
